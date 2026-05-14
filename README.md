@@ -1,6 +1,6 @@
 # flaglog
 
-Feature-flag service with a built-in audit log. Clojure, Datomic, AWS Fargate.
+Feature-flag service with a built-in audit log. Clojure, Datomic, AWS.
 
 The audit log isn't a separate table. Every flag value is just stored in Datomic, which keeps full history automatically. Each `PUT` records `actor` and `reason` on the transaction itself (`:tx/actor`, `:tx/reason`), so the audit metadata travels with the change. Point-in-time reads are `d/as-of`; the full timeline is `d/history`.
 
@@ -45,6 +45,6 @@ terraform init
 terraform apply -var='image_tag=<sha>'
 ```
 
-Provisions a VPC, ECR repo, ECS Fargate cluster + service, ALB, IAM roles, and a CloudWatch log group. The image must already be in ECR — `.github/workflows/ci.yml` builds it on every push to `main`; pushing to ECR is left for you to wire up once an AWS account is connected.
+Provisions a VPC, ECR repo, ECS cluster + service, ALB, IAM roles, and a CloudWatch log group. The image must already be in ECR — `.github/workflows/ci.yml` builds it on every push to `main`; pushing to ECR is left for you to wire up once an AWS account is connected.
 
 The deployment runs Datomic in dev/in-memory mode embedded in the peer process, so data resets on task restart. A real deployment would swap the URI for a Datomic transactor backed by DynamoDB.

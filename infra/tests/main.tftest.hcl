@@ -33,10 +33,10 @@ run "plan_with_minimal_vars" {
     image_tag = "test-sha"
   }
 
-  # Single Fargate task is the documented demo posture.
+  # Single ECS task is the documented demo posture.
   assert {
     condition     = aws_ecs_service.this.desired_count == 1
-    error_message = "expected a single Fargate task in the demo deployment"
+    error_message = "expected a single ECS task in the demo deployment"
   }
 
   # Health check must point at the app's /healthz endpoint.
@@ -57,10 +57,10 @@ run "plan_with_minimal_vars" {
     error_message = "service SG should have exactly one ingress rule (ALB only)"
   }
 
-  # Fargate task must never have a public IP.
+  # ECS task must never have a public IP.
   assert {
     condition     = aws_ecs_service.this.network_configuration[0].assign_public_ip == false
-    error_message = "Fargate task must run with no public IP"
+    error_message = "ECS task must run with no public IP"
   }
 
   # CloudWatch log retention must be bounded.
