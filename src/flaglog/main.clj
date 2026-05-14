@@ -6,12 +6,6 @@
             [flaglog.system])
   (:gen-class))
 
-;; Teach Aero how to read Integrant's #ig/ref tag so we can express component
-;; wiring directly in config.edn.
-(defmethod aero/reader 'ig/ref
-  [_opts _tag value]
-  (ig/ref value))
-
 (defn- read-config
   ([] (read-config :prod))
   ([profile]

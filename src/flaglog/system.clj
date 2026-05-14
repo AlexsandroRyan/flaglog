@@ -2,10 +2,18 @@
   "Integrant component wiring. Each defmethod here turns a key from
   resources/config.edn into a live component, and the matching halt-key!
   cleanly tears it down."
-  (:require [com.brunobonacci.mulog :as mu]
+  (:require [aero.core :as aero]
+            [com.brunobonacci.mulog :as mu]
             [integrant.core :as ig]
             [flaglog.db :as db]
             [flaglog.http :as http]))
+
+;; Teach Aero how to read Integrant's #ig/ref tag in config.edn. Lives here
+;; (not in flaglog.main) so the REPL workflow and any other config consumer
+;; gets the registration just by requiring flaglog.system.
+(defmethod aero/reader 'ig/ref
+  [_opts _tag value]
+  (ig/ref value))
 
 ;; ---------- :flaglog/logging ----------
 
