@@ -1,0 +1,11 @@
+{:flaglog/db   {:datomic-uri #profile {:dev  "datomic:mem://flaglog-dev"
+                                       :test "datomic:mem://flaglog-test"
+                                       :prod #or [#env DATOMIC_URI "datomic:dev://localhost:4334/flaglog"]}}
+
+ :flaglog/http {:port   #long #or [#env PORT 8080]
+                :host   #or [#env HOST "0.0.0.0"]
+                :db     #ig/ref :flaglog/db}
+
+ :flaglog/logging {:publisher #profile {:dev  :console
+                                        :test :noop
+                                        :prod :console}}}
