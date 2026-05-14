@@ -1,0 +1,47 @@
+;; Datomic schema for flaglog.
+;;
+;; Design notes:
+;; - A "flag" is identified by a string key (unique, like "checkout.new-flow").
+;; - The flag's *current* value lives at the entity as :flag/value.
+;; - Because Datomic retains all prior assertions, we get the full history for free
+;;   via (d/history db) without needing a separate audit table.
+;; - Each change can optionally carry actor + reason metadata via reified
+;;   transaction attributes, so the audit log answers "who changed it and why".
+;;
+;; Values are stored as :db.type/string (JSON-encoded). Keeping the schema simple
+;; means we can support bool/number/string/json flags through one attribute.
+
+[;; ---------- Flag entity ----------
+ {:db/ident       :flag/key
+  :db/valueType   :db.type/string
+  :db/cardinality :db.cardinality/one
+  :db/unique      :db.unique/identity
+  :db/doc         "Stable, human-readable key for the flag, e.g. 'checkout.new-flow'."}
+
+ {:db/ident       :flag/value
+  :db/valueType   :db.type/string
+  :db/cardinality :db.cardinality/one
+  :db/doc         "Current value, JSON-encoded. Empty string means unset (use retraction instead in practice)."}
+
+ {:db/ident       :flag/description
+  :db/valueType   :db.type/string
+  :db/cardinality :db.cardinality/one
+  :db/doc         "Optional description of what the flag controls."}
+
+ {:db/ident       :flag/created-at
+  :db/valueType   :db.type/instant
+  :db/cardinality :db.cardinality/one
+  :db/doc         "When the flag was first created."}
+
+ ;; ---------- Reified transaction metadata ----------
+ ;; These are attached to the transaction entity itself, not the flag, so
+ ;; every change carries its own actor/reason in the history.
+ {:db/ident       :tx/actor
+  :db/valueType   :db.type/string
+  :db/cardinality :db.cardinality/one
+  :db/doc         "Identifier of who (user/system) performed this transaction."}
+
+ {:db/ident       :tx/reason
+  :db/valueType   :db.type/string
+  :db/cardinality :db.cardinality/one
+  :db/doc         "Free-text reason for the change."}]
